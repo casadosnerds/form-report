@@ -68,7 +68,12 @@
   </style>
 </head>
 <body>
-  <form id="reportForm">
+  <form id="reportForm" 
+        method="post"
+        action="https://script.google.com/macros/s/AKfycbxDP2GlnxtlxDgqmwvxLtiIzyma0xcDaSw56O98YwOu/dev"
+        target="hidden_iframe"
+        onsubmit="document.getElementById('resultado').textContent='Enviando...';">
+    
     <label for="nome">Nome de usuário:</label>
     <input type="text" id="nome" name="nome" required />
     
@@ -95,46 +100,24 @@
     <div id="resultado"></div>
   </form>
 
-  <script>
-    const form = document.getElementById('reportForm');
-    const resultado = document.getElementById('resultado');
-    const endpoint = "https://script.google.com/macros/s/AKfycbz-mA2EOTDF8jtHuXt6aCG-yNVU7GIkNe6gP7wxdtDyMpyI0BI1YboLcNU2f7Q5odHuUQ/exec"; // Ex: "https://script.google.com/macros/s/SEU_SCRIPT_ID/exec"
-    
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      resultado.textContent = "";
-      
-      const formData = {
-        nome: form.nome.value.trim(),
-        email: form.email.value.trim(),
-        item: form.item.value,
-        link: form.link.value.trim(),
-        comentarios: form.comentarios.value.trim(),
-      };
+  <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
 
-      try {
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
-        });
-        
-        const result = await response.json();
-        
-        if (result.status === "success") {
-          resultado.textContent = result.message;
-          form.reset();
-        } else {
-          resultado.textContent = result.message || "Erro ao enviar.";
-        }
-      } catch (err) {
-        resultado.textContent = "Erro ao enviar: " + err.message;
+  <script>
+    // Detecta resposta do envio para mostrar mensagem de sucesso ou erro
+    // Como não é possível interceptar diretamente o conteúdo enviado pelo Apps Script,
+    // vamos monitorar o iframe carregando e presumir que o envio foi concluído.
+    
+    const iframe = document.getElementById('hidden_iframe');
+    const resultado = document.getElementById('resultado');
+    const form = document.getElementById('reportForm');
+
+    iframe.addEventListener('load', () => {
+      // Envio concluído - atualiza mensagem e reseta formulário
+      if (resultado.textContent === 'Enviando...') {
+        resultado.textContent = 'Enviado com Sucesso!';
+        form.reset();
       }
     });
   </script>
 </body>
 </html>
-
