@@ -1,5 +1,140 @@
-<html>
-  
-<iframe src="https://script.google.com/macros/library/d/15qOwjXpDw2ebU6BkuxznKNzxXn5tZ7CG8eXROJboBffiOAfa4bHylBwn/1" width="400" height="550" frameborder="0"></iframe>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Formulário de Reporte</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #000;
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+    }
+    form {
+      background-color: #fff;
+      border: 2px solid #000;
+      padding: 20px 30px;
+      border-radius: 8px;
+      width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="url"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1.5px solid #000;
+      border-radius: 4px;
+      background-color: #fff;
+      color: #000;
+      font-size: 14px;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    input[type="submit"] {
+      background-color: #fff;
+      color: #000;
+      border: 2px solid #000;
+      padding: 10px 20px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 20px;
+      width: 100%;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    input[type="submit"]:hover {
+      background-color: #000;
+      color: #fff;
+    }
+    #resultado {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+      min-height: 24px;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <form id="reportForm">
+    <label for="nome">Nome de usuário:</label>
+    <input type="text" id="nome" name="nome" required />
+    
+    <label for="email">E-mail:</label>
+    <input type="email" id="email" name="email" required />
+    
+    <label for="item">Item a reportar:</label>
+    <select id="item" name="item" required>
+      <option value="" disabled selected>Selecione</option>
+      <option value="Usuário">Usuário</option>
+      <option value="Extensão">Extensão</option>
+      <option value="Erro no site">Erro no site</option>
+      <option value="Outros">Outros</option>
+    </select>
+    
+    <label for="link">Link do item reportado:</label>
+    <input type="url" id="link" name="link" required />
+    
+    <label for="comentarios">Comentários:</label>
+    <textarea id="comentarios" name="comentarios" rows="5" required></textarea>
+    
+    <input type="submit" value="Enviar" />
+    
+    <div id="resultado"></div>
+  </form>
 
+  <script>
+    const form = document.getElementById('reportForm');
+    const resultado = document.getElementById('resultado');
+    const endpoint = "https://script.google.com/macros/s/AKfycbz-mA2EOTDF8jtHuXt6aCG-yNVU7GIkNe6gP7wxdtDyMpyI0BI1YboLcNU2f7Q5odHuUQ/exec"; // Ex: "https://script.google.com/macros/s/SEU_SCRIPT_ID/exec"
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resultado.textContent = "";
+      
+      const formData = {
+        nome: form.nome.value.trim(),
+        email: form.email.value.trim(),
+        item: form.item.value,
+        link: form.link.value.trim(),
+        comentarios: form.comentarios.value.trim(),
+      };
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === "success") {
+          resultado.textContent = result.message;
+          form.reset();
+        } else {
+          resultado.textContent = result.message || "Erro ao enviar.";
+        }
+      } catch (err) {
+        resultado.textContent = "Erro ao enviar: " + err.message;
+      }
+    });
+  </script>
+</body>
 </html>
+
